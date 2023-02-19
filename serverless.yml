@@ -19,6 +19,7 @@ provider:
     IMAGES_TABLE: Images-demo-${env:stage, 'dev'}
     IMAGE_ID_INDEX: ImageIdIndexDemo
     IMAGES_S3_BUCKET: serverless-udagram-images-demo-${self:provider.stage}
+    SIGNED_URL_EXPIRATION: 300
 
   iamRoleStatements:
     - Effect: Allow
@@ -36,6 +37,11 @@ provider:
       Action:
         - dynamodb:Query
       Resource: arn:aws:dynamodb:${env:region, 'us-east-1'}:*:table/Images-demo-${env:stage, 'dev'}/index/ImageIdIndexDemo
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
 
 custom:
   documentation:
