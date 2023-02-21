@@ -21,6 +21,8 @@ provider:
     CONNECTIONS_TABLE: Connections-Demo-${env:stage, 'dev'}
     IMAGES_S3_BUCKET: serverless-udagram-images-demo-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
+    THUMBNAILS_S3_BUCKET: serverless-udagram-thumbnail-demo-${self:provider.stage}
+
 
   iamRoleStatements:
     - Effect: Allow
@@ -43,6 +45,10 @@ provider:
         - s3:PutObject
         - s3:GetObject
       Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: "arn:aws:s3:::${self:provider.environment.THUMBNAILS_S3_BUCKET}/*"
     - Effect: Allow
       Action:
         - dynamodb:Scan
@@ -148,6 +154,18 @@ functions:
     events:
       - websocket:
           route: $disconnect
+  ResizeImage:
+    handler: src/lambda/s3/resizeImage.handler
+    events:
+      - sns:
+          arn:
+            Fn::Join:
+              - ':'
+              - - arn:aws:sns
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${self:custom.topicName}
+          topicName: ${self:custom.topicName}
 
   SyncWithElasticsearch:
     environment:
