@@ -22,7 +22,7 @@ provider:
     IMAGES_S3_BUCKET: serverless-udagram-images-demo-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
     THUMBNAILS_S3_BUCKET: serverless-udagram-thumbnail-demo-${self:provider.stage}
-    AUTH_0_SECRET_FIELD: 1ds28AW3gndtZE0t7Iku2-6DYfwZ09DX4f2OpVoFdkFm-51ku8-GmLknR-GqmgFO
+    AUTH_0_SECRET: 1ds28AW3gndtZE0t7Iku2-6DYfwZ09DX4f2OpVoFdkFm-51ku8-GmLknR-GqmgFO
 
 
   iamRoleStatements:
