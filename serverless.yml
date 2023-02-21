@@ -22,6 +22,7 @@ provider:
     IMAGES_S3_BUCKET: serverless-udagram-images-demo-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
     THUMBNAILS_S3_BUCKET: serverless-udagram-thumbnail-demo-${self:provider.stage}
+    AUTH_0_SECRET_FIELD: 1ds28AW3gndtZE0t7Iku2-6DYfwZ09DX4f2OpVoFdkFm-51ku8-GmLknR-GqmgFO
 
 
   iamRoleStatements:
@@ -74,6 +75,9 @@ custom:
 
 functions:
 
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+
   GetGroups:
     handler: src/lambda/http/getGroups.handler
     events:
@@ -89,6 +93,7 @@ functions:
           method: post
           path: /groups
           cors: true
+          authorizer: Auth
           reqValidatorName: 'RequestBodyValidator'
           documentation:
             summary: Create a new group
@@ -119,6 +124,7 @@ functions:
           method: post
           path: /groups/{groupId}/images
           cors: true
+          authorizer: Auth
           reqValidatorName: 'RequestBodyValidator'
           documentation:
             summary: Create a new image
@@ -178,6 +184,16 @@ functions:
 
 resources:
   Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
 
     RequestBodyValidator:
       Type: "AWS::ApiGateway::RequestValidator"
